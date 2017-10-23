@@ -13,7 +13,7 @@ namespace Engine
 
         public static double Evaluate(string formula, object context, params Operand[] variables)
         {
-            var injectedFormula = InjectValues(formula, context, variables).Replace(',', '.');
+            var injectedFormula = InjectValues(formula, context, variables);
             var dt = new DataTable();
             var result = dt.Compute(injectedFormula, string.Empty);
 
@@ -31,7 +31,10 @@ namespace Engine
                 var operand = operands.Single(x => Equals(x.Id, id));
                 return operand.Value.ToString(CultureInfo.InvariantCulture);
             };
-            var injectedFormula = Regex.Replace(formula, Operand.Regex_Op_Id_Placeholder, evaluator);
+            var injectedFormula =
+                Regex
+                    .Replace(formula, Operand.Regex_Op_Id_Placeholder, evaluator)
+                    .Replace(',', '.');
 
             return injectedFormula;
         }
