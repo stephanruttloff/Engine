@@ -11,6 +11,11 @@ namespace Engine
     {
         #region Interface
 
+        public static double Evaluate(string formula, params Operand[] variables)
+        {
+            return Evaluate(formula, null, variables);
+        }
+
         public static double Evaluate(string formula, object context, params Operand[] variables)
         {
             var injectedFormula = InjectValues(formula, context, variables);
@@ -18,6 +23,11 @@ namespace Engine
             var result = dt.Compute(injectedFormula, string.Empty);
 
             return double.Parse(result.ToString());
+        }
+
+        public static string InjectValues(string formula, params Operand[] variables)
+        {
+            return InjectValues(formula, null, variables);
         }
 
         public static string InjectValues(string formula, object context, params Operand[] variables)
@@ -37,6 +47,11 @@ namespace Engine
                     .Replace(',', '.');
 
             return injectedFormula;
+        }
+
+        public static string GetFormula(string formula, params Operand[] variables)
+        {
+            return GetFormula(formula, null, variables);
         }
 
         public static string GetFormula(string formula, object context, params Operand[] variables)

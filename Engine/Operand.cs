@@ -57,14 +57,14 @@ namespace Engine
 
         public static Operand operator +(Operand left, double right)
         {
-            var name = $"{left.Name} + {right.ToStringIG()}";
+            var name = $"({left.Name} + {right.ToStringIG()})";
             var value = left.Value + right;
             return new Operand(name, value);
         }
 
         public static Operand operator +(double left, Operand right)
         {
-            var name = $"{left.ToStringIG()} + {right.Name}";
+            var name = $"({left.ToStringIG()} + {right.Name})";
             var value = left + right.Value;
             return new Operand(name, value);
         }
@@ -86,14 +86,14 @@ namespace Engine
 
         public static Operand operator -(Operand left, double right)
         {
-            var name = $"{left.Name} - {right.ToStringIG()}";
+            var name = $"({left.Name} - {right.ToStringIG()})";
             var value = left.Value - right;
             return new Operand(name, value);
         }
 
         public static Operand operator -(double left, Operand right)
         {
-            var name = $"{left.ToStringIG()} - {right.Name}";
+            var name = $"({left.ToStringIG()} - {right.Name})";
             var value = left - right.Value;
             return new Operand(name, value);
         }
@@ -115,14 +115,14 @@ namespace Engine
 
         public static Operand operator *(Operand left, double right)
         {
-            var name = $"{left.Name} * {right.ToStringIG()}";
+            var name = $"({left.Name} * {right.ToStringIG()})";
             var value = left.Value * right;
             return new Operand(name, value);
         }
 
         public static Operand operator *(double left, Operand right)
         {
-            var name = $"{left.ToStringIG()} * {right.Name}";
+            var name = $"({left.ToStringIG()} * {right.Name})";
             var value = left * right.Value;
             return new Operand(name, value);
         }
@@ -144,14 +144,14 @@ namespace Engine
 
         public static Operand operator /(Operand left, double right)
         {
-            var name = $"{left.Name} / {right.ToStringIG()}";
+            var name = $"({left.Name} / {right.ToStringIG()})";
             var value = left.Value / right;
             return new Operand(name, value);
         }
 
         public static Operand operator /(double left, Operand right)
         {
-            var name = $"{left.ToStringIG()} / {right.Name}";
+            var name = $"({left.ToStringIG()} / {right.Name})";
             var value = left / right.Value;
             return new Operand(name, value);
         }
