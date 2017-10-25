@@ -13,15 +13,35 @@ namespace Engine
 
         #region Properties
 
-        public string Id { get; }
+        /// <summary>
+        /// ID of this operand
+        /// </summary>
+        internal string Id { get; }
+        /// <summary>
+        /// Name of this operand
+        /// </summary>
         public string Name { get; }
+        /// <summary>
+        /// Value of this operand
+        /// </summary>
         public double Value { get; }
-        public Origin Origin { get; }
+        /// <summary>
+        /// Origin ot this operand (if is result of calculation)
+        /// </summary>
+        internal Origin Origin { get; }
+        /// <summary>
+        /// True, if this operand is the result of a calculation
+        /// </summary>
+        public bool HasOrigin { get; }
 
         #endregion
 
         #region Constructor
 
+        /// <summary>
+        /// Create an operand without a name. Name will be equal to value.
+        /// </summary>
+        /// <param name="value">Value of this operand.</param>
         public Operand(double value) : this()
         {
             Id = GetId();
@@ -29,6 +49,11 @@ namespace Engine
             Value = value;
         }
 
+        /// <summary>
+        /// Create an operand with name and value.
+        /// </summary>
+        /// <param name="name">Name of this operand.</param>
+        /// <param name="value">Value of this operand.</param>
         public Operand(string name, double value) : this()
         {
             Id = GetId();
@@ -36,12 +61,19 @@ namespace Engine
             Value = value;
         }
 
+        /// <summary>
+        /// Create an operand with name, value and origin.
+        /// </summary>
+        /// <param name="name">Name of this operand.</param>
+        /// <param name="value">Value of this operand.</param>
+        /// <param name="origin">Origin of this operand.</param>
         private Operand(string name, double value, Origin origin) : this()
         {
             Id = GetId();
             Name = name;
             Value = value;
             Origin = origin;
+            HasOrigin = true;
         }
 
         #endregion

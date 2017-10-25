@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Engine;
 
 namespace Demo
@@ -11,15 +12,38 @@ namespace Demo
             var var1 = new Operand(@"var1", 42);
             var var2 = new Operand(@"var2", 23);
 
-            var simple1 = c.A + 2 / c.B - var1 * var2;
-            var simple2 = (c.A + 2) / c.B - var1 * var2;
+            // Calculation with operands
+            var simple = (c.A + 2) / ((c.B - var1) * var2) + c.C;
+            var algorithm = Evaluator.RecoverAlgorithm(simple, out var operands);
+            var injected = Evaluator.InjectValues(algorithm, null, operands.ToArray());
+            var formula = Evaluator.GetFormula(algorithm, null, operands.ToArray());
+            var simplified = Evaluator.Simplify(formula);
+            var simplifiedInjected = Evaluator.Simplify(injected);
+            Console.WriteLine("Operands:");
+            Console.WriteLine("=========");
+            Console.WriteLine(@"Algorithm:  " + algorithm);
+            Console.WriteLine(@"Formula:    " + formula);
+            Console.WriteLine(@"Simplified: " + simplified);
+            Console.WriteLine(@"Injected:   " + injected);
+            Console.WriteLine(@"Simplified: " + simplifiedInjected);
+            Console.WriteLine(@"Result:     " + simple.Value);
+            
+            Console.WriteLine();
 
-            var fComplex = $"{c.A} + ({c.B} / {c.C}) + (0,3 / {var1}) * {var2}";
-
-            Console.WriteLine($"{nameof(fComplex)}:");
-            Console.WriteLine(Evaluator.GetFormula(fComplex, c, var1, var2));
-            Console.WriteLine(Evaluator.InjectValues(fComplex, c, var1, var2));
-            Console.WriteLine(Evaluator.Evaluate(fComplex, c, var1, var2));
+            // Calculation inside a string
+            algorithm = $"({c.A} + 2) / (({c.B} - {var1}) * {var2}) + {c.C}";
+            injected = Evaluator.InjectValues(algorithm, c, var1, var2);
+            formula = Evaluator.GetFormula(algorithm, c, var1, var2);
+            simplified = Evaluator.Simplify(formula);
+            simplifiedInjected = Evaluator.Simplify(injected);
+            Console.WriteLine("String:");
+            Console.WriteLine("=======");
+            Console.WriteLine(@"Algorithm:  " + algorithm);
+            Console.WriteLine(@"Formula:    " + formula);
+            Console.WriteLine(@"Simplified: " + simplified);
+            Console.WriteLine(@"Injected:   " + injected);
+            Console.WriteLine(@"Simplified: " + simplifiedInjected);
+            Console.WriteLine(@"Result:     " + Evaluator.Evaluate(algorithm, c, var1, var2));
 
             Console.ReadKey(false);
         }
