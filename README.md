@@ -21,6 +21,6 @@ Console.WriteLine(@"Simplified: " + simplifiedInjected);
 Console.WriteLine(@"Result:     " + simple.Value);
 ```
 
-!()[demo_result.png]
+![result](demo_result.png)
 
 See Demo project for examples on how to use this.
