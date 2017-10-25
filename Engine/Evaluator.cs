@@ -35,15 +35,17 @@ namespace Engine
             var ids = GetIdsFromFormula(formula);
             var constants = GetConstantOperators(context);
             var operands = GetOperandsFromIds(ids, constants, variables);
-            MatchEvaluator evaluator = match =>
+
+            string MatchEvaluator(Match match)
             {
                 var id = match.Groups[1].Value;
                 var operand = operands.Single(x => Equals(x.Id, id));
                 return operand.Value.ToString(CultureInfo.InvariantCulture);
-            };
+            }
+
             var injectedFormula =
                 Regex
-                    .Replace(formula, Operand.Regex_Op_Id_Placeholder, evaluator)
+                    .Replace(formula, Operand.Regex_Op_Id_Placeholder, MatchEvaluator)
                     .Replace(',', '.');
 
             return injectedFormula;
@@ -59,13 +61,15 @@ namespace Engine
             var ids = GetIdsFromFormula(formula);
             var constants = GetConstantOperators(context);
             var operands = GetOperandsFromIds(ids, constants, variables);
-            MatchEvaluator evaluator = match =>
+
+            string MatchEvaluator(Match match)
             {
                 var id = match.Groups[1].Value;
                 var operand = operands.Single(x => Equals(x.Id, id));
                 return operand.Name;
-            };
-            var readableFormula = Regex.Replace(formula, Operand.Regex_Op_Id_Placeholder, evaluator);
+            }
+
+            var readableFormula = Regex.Replace(formula, Operand.Regex_Op_Id_Placeholder, MatchEvaluator);
 
             return readableFormula;
         }
@@ -79,7 +83,7 @@ namespace Engine
             if (context == null)
                 return Enumerable.Empty<Operand>().ToArray();
 
-            Type type = context.GetType();
+            var type = context.GetType();
             var properties = type.GetProperties();
             var propertyConstants = properties.Where(x=>Attribute.IsDefined(x, typeof(Constant))).Select(x=>x.GetValue(context)).OfType<Operand>();
             var fields = type.GetFields();
