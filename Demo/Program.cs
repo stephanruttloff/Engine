@@ -8,14 +8,11 @@ namespace Demo
         static void Main(string[] args)
         {
             var c = new Constants();
-            var var1 = new Operand(0.3);
-            var var2 = var1 + 2;
-            var fSimple = var1 + var2;
+            var var1 = new Operand(@"var1", 42);
+            var var2 = new Operand(@"var2", 23);
 
-            Console.WriteLine($"{nameof(fSimple)}:");
-            Console.WriteLine(Evaluator.GetFormula(fSimple, var1, var2));
-            Console.WriteLine(Evaluator.InjectValues(fSimple, var1, var2));
-            Console.WriteLine(Evaluator.Evaluate(fSimple, var1, var2));
+            var simple1 = c.A + 2 / c.B - var1 * var2;
+            var simple2 = (c.A + 2) / c.B - var1 * var2;
 
             var fComplex = $"{c.A} + ({c.B} / {c.C}) + (0,3 / {var1}) * {var2}";
 

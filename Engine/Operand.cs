@@ -17,6 +17,7 @@ namespace Engine
         public string Id { get; }
         public string Name { get; }
         public double Value { get; }
+        public Origin Origin { get; }
 
         #endregion
 
@@ -36,124 +37,144 @@ namespace Engine
             Value = value;
         }
 
+        private Operand(string name, double value, Origin origin) : this()
+        {
+            Id = GetId();
+            Name = name;
+            Value = value;
+            Origin = origin;
+        }
+
         #endregion
 
         #region Operators
 
-        public static string operator +(Operand left, Operand right)
+        public static Operand operator +(Operand left, Operand right)
         {
-            return $"{left} + {right}";
+            var algorithm = $"({left} + {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value + right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator +(string left, Operand right)
+        public static Operand operator -(Operand left, Operand right)
         {
-            return $"{left} + {right}";
+            var algorithm = $"({left} - {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value - right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator +(Operand left, string right)
+        public static Operand operator *(Operand left, Operand right)
         {
-            return $"{left} + {right}";
+            var algorithm = $"({left} * {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value * right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static Operand operator +(Operand left, double right)
+        public static Operand operator /(Operand left, Operand right)
         {
-            var name = $"({left.Name} + {right.ToStringIG()})";
-            var value = left.Value + right;
-            return new Operand(name, value);
+            var algorithm = $"({left} / {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value / right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static Operand operator +(double left, Operand right)
+        public static Operand operator +(double leftValue, Operand right)
         {
-            var name = $"({left.ToStringIG()} + {right.Name})";
-            var value = left + right.Value;
-            return new Operand(name, value);
+            var left = new Operand(leftValue);
+            var algorithm = $"({left} + {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value + right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator -(Operand left, Operand right)
+        public static Operand operator +(Operand left, double rightValue)
         {
-            return $"{left} - {right}";
+            var right = new Operand(rightValue);
+            var algorithm = $"({left} + {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value + right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator -(string left, Operand right)
+        public static Operand operator -(double leftValue, Operand right)
         {
-            return $"{left} - {right}";
+            var left = new Operand(leftValue);
+            var algorithm = $"({left} - {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value - right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator -(Operand left, string right)
+        public static Operand operator -(Operand left, double rightValue)
         {
-            return $"{left} - {right}";
+            var right = new Operand(rightValue);
+            var algorithm = $"({left} - {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value - right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static Operand operator -(Operand left, double right)
+        public static Operand operator *(double leftValue, Operand right)
         {
-            var name = $"({left.Name} - {right.ToStringIG()})";
-            var value = left.Value - right;
-            return new Operand(name, value);
+            var left = new Operand(leftValue);
+            var algorithm = $"({left} * {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value * right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static Operand operator -(double left, Operand right)
+        public static Operand operator *(Operand left, double rightValue)
         {
-            var name = $"({left.ToStringIG()} - {right.Name})";
-            var value = left - right.Value;
-            return new Operand(name, value);
+            var right = new Operand(rightValue);
+            var algorithm = $"({left} * {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value * right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator *(Operand left, Operand right)
+        public static Operand operator /(double leftValue, Operand right)
         {
-            return $"{left} * {right}";
+            var left = new Operand(leftValue);
+            var algorithm = $"({left} / {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value / right.Value;
+
+            return new Operand(name, value, origin);
         }
 
-        public static string operator *(string left, Operand right)
+        public static Operand operator /(Operand left, double rightValue)
         {
-            return $"{left} * {right}";
-        }
+            var right = new Operand(rightValue);
+            var algorithm = $"({left} / {right})";
+            var name = Evaluator.GetFormula(algorithm, left, right);
+            var origin = new Origin(algorithm, left, right);
+            var value = left.Value / right.Value;
 
-        public static string operator *(Operand left, string right)
-        {
-            return $"{left} * {right}";
-        }
-
-        public static Operand operator *(Operand left, double right)
-        {
-            var name = $"({left.Name} * {right.ToStringIG()})";
-            var value = left.Value * right;
-            return new Operand(name, value);
-        }
-
-        public static Operand operator *(double left, Operand right)
-        {
-            var name = $"({left.ToStringIG()} * {right.Name})";
-            var value = left * right.Value;
-            return new Operand(name, value);
-        }
-
-        public static string operator /(Operand left, Operand right)
-        {
-            return $"{left} / {right}";
-        }
-
-        public static string operator /(string left, Operand right)
-        {
-            return $"{left} / {right}";
-        }
-
-        public static string operator /(Operand left, string right)
-        {
-            return $"{left} / {right}";
-        }
-
-        public static Operand operator /(Operand left, double right)
-        {
-            var name = $"({left.Name} / {right.ToStringIG()})";
-            var value = left.Value / right;
-            return new Operand(name, value);
-        }
-
-        public static Operand operator /(double left, Operand right)
-        {
-            var name = $"({left.ToStringIG()} / {right.Name})";
-            var value = left / right.Value;
-            return new Operand(name, value);
+            return new Operand(name, value, origin);
         }
 
         #endregion
