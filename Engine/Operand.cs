@@ -215,6 +215,11 @@ namespace Engine
             return new Operand(Name, Value);
         }
 
+        public Operand AsConstant(string name)
+        {
+            return new Operand(name, Value);
+        }
+
         public override string ToString()
         {
             return $"[[{Id}]]";

@@ -33,7 +33,8 @@ Console.WriteLine(@"Result:   " + result.Value);
 
 Console.WriteLine();
 
-result = Operand.Round(Operand.Floor(var1 * var2 / var3).AsConstant() / Operand.Ceiling(var1 * var2 / var3).AsConstant());
+result = Operand.Round(Operand.Floor(var1 * var2 / var3).AsConstant(@"FLOOR") /
+    Operand.Ceiling(var1 * var2 / var3).AsConstant(@"CEILING"));
 
 Console.WriteLine(@"Formula:  " + result.GetFormula());
 Console.WriteLine(@"Injected: " + result.GetFormula(true));
@@ -48,6 +49,8 @@ Console.WriteLine(@"Injected: " + result.GetFormula(true));
 Console.WriteLine(@"Result:   " + result.Value);
 
 Console.WriteLine();
+
+Console.ReadKey(false);
 ```
 
 ![result](demo_result.png)
