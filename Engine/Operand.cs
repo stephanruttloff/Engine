@@ -1,16 +1,11 @@
 ﻿using System;
+using System.Data;
+using System.Globalization;
 
 namespace Engine
 {
     public struct Operand
     {
-        #region Fields
-
-        public static readonly string Regex_Op_Id = @"([{(]?[0-9A-F]{8}[-]?([0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?)";
-        public static readonly string Regex_Op_Id_Placeholder = @"\[{2}([0-9A-F]{8}[-]?([0-9A-F]{4}[-]?){3}[0-9A-F]{12})\]{2}";
-
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -30,9 +25,9 @@ namespace Engine
         /// </summary>
         internal Origin Origin { get; }
         /// <summary>
-        /// True, if this operand is the result of a calculation
+        /// True, if this is NOT the result of calculation
         /// </summary>
-        public bool HasOrigin { get; }
+        public bool IsConstant { get; }
 
         #endregion
 
@@ -45,8 +40,9 @@ namespace Engine
         public Operand(double value) : this()
         {
             Id = GetId();
-            Name = value.ToStringIG();
+            Name = value.ToString("G", CultureInfo.InvariantCulture);
             Value = value;
+            IsConstant = true;
         }
 
         /// <summary>
@@ -59,6 +55,7 @@ namespace Engine
             Id = GetId();
             Name = name;
             Value = value;
+            IsConstant = true;
         }
 
         /// <summary>
@@ -73,7 +70,7 @@ namespace Engine
             Name = name;
             Value = value;
             Origin = origin;
-            HasOrigin = true;
+            IsConstant = false;
         }
 
         #endregion
@@ -82,144 +79,230 @@ namespace Engine
 
         public static Operand operator +(Operand left, Operand right)
         {
-            var algorithm = $"({left} + {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value + right.Value;
-
-            return new Operand(name, value, origin);
-        }
-
-        public static Operand operator -(Operand left, Operand right)
-        {
-            var algorithm = $"({left} - {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value - right.Value;
-
-            return new Operand(name, value, origin);
-        }
-
-        public static Operand operator *(Operand left, Operand right)
-        {
-            var algorithm = $"({left} * {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value * right.Value;
-
-            return new Operand(name, value, origin);
-        }
-
-        public static Operand operator /(Operand left, Operand right)
-        {
-            var algorithm = $"({left} / {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value / right.Value;
-
-            return new Operand(name, value, origin);
+            return Add(left, right);
         }
 
         public static Operand operator +(double leftValue, Operand right)
         {
-            var left = new Operand(leftValue);
-            var algorithm = $"({left} + {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value + right.Value;
-
-            return new Operand(name, value, origin);
+            return Add(new Operand(leftValue), right);
         }
 
         public static Operand operator +(Operand left, double rightValue)
         {
-            var right = new Operand(rightValue);
-            var algorithm = $"({left} + {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value + right.Value;
+            return Add(left, new Operand(rightValue));
+        }
 
-            return new Operand(name, value, origin);
+        public static Operand operator -(Operand left, Operand right)
+        {
+            return Subtract(left, right);
         }
 
         public static Operand operator -(double leftValue, Operand right)
         {
-            var left = new Operand(leftValue);
-            var algorithm = $"({left} - {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value - right.Value;
-
-            return new Operand(name, value, origin);
+            return Subtract(new Operand(leftValue), right);
         }
 
         public static Operand operator -(Operand left, double rightValue)
         {
-            var right = new Operand(rightValue);
-            var algorithm = $"({left} - {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value - right.Value;
+            return Subtract(left, new Operand(rightValue));
+        }
 
-            return new Operand(name, value, origin);
+        public static Operand operator *(Operand left, Operand right)
+        {
+            return Multiply(left, right);
         }
 
         public static Operand operator *(double leftValue, Operand right)
         {
-            var left = new Operand(leftValue);
-            var algorithm = $"({left} * {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value * right.Value;
-
-            return new Operand(name, value, origin);
+            return Multiply(new Operand(leftValue), right);
         }
 
         public static Operand operator *(Operand left, double rightValue)
         {
-            var right = new Operand(rightValue);
-            var algorithm = $"({left} * {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value * right.Value;
+            return Multiply(left, new Operand(rightValue));
+        }
 
-            return new Operand(name, value, origin);
+        public static Operand operator /(Operand left, Operand right)
+        {
+            return Divide(left, right);
         }
 
         public static Operand operator /(double leftValue, Operand right)
         {
-            var left = new Operand(leftValue);
-            var algorithm = $"({left} / {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value / right.Value;
-
-            return new Operand(name, value, origin);
+            return Divide(new Operand(leftValue), right);
         }
 
         public static Operand operator /(Operand left, double rightValue)
         {
-            var right = new Operand(rightValue);
-            var algorithm = $"({left} / {right})";
-            var name = Evaluator.GetFormula(algorithm, left, right);
-            var origin = new Origin(algorithm, left, right);
-            var value = left.Value / right.Value;
+            return Divide(left, new Operand(rightValue));
+        }
 
-            return new Operand(name, value, origin);
+        public static Operand operator %(Operand left, Operand right)
+        {
+            return Remainder(left, right);
+        }
+
+        public static Operand operator %(Operand left, double rightValue)
+        {
+            return Remainder(left, new Operand(rightValue));
+        }
+
+        public static Operand operator %(double leftValue, Operand right)
+        {
+            return Remainder(new Operand(leftValue), right);
         }
 
         #endregion
 
         #region Methods
 
+        public string GetFormula(bool injectValue = false)
+        {
+            if (IsConstant)
+                return injectValue ? $"{Value.ToString(@"G", CultureInfo.InvariantCulture)}" : $"{Name ?? Value.ToString(@"G", CultureInfo.InvariantCulture)}";
+
+            if (!Origin.Binary)
+                return $"{Origin.Operation.Description()}({Origin.Left.GetFormula(injectValue)})";
+
+            if (Origin.Operation == Operations.Multiply ||
+                Origin.Operation == Operations.Divide ||
+                Origin.Operation == Operations.Remainder)
+            {
+                var formula = string.Empty;
+
+                if (Origin.Left.IsConstant)
+                {
+                    formula += $"{Origin.Left.GetFormula(injectValue)}";
+                }
+                else
+                {
+                    var leftOperation = Origin.Left.Origin.Operation;
+                    if (leftOperation == Operations.Add ||
+                        leftOperation == Operations.Subtract)
+                        formula += $"({Origin.Left.GetFormula(injectValue)})";
+                    else
+                        formula += $"{Origin.Left.GetFormula(injectValue)}";
+                }
+
+                formula += $" {Origin.Operation.Description()} ";
+
+                if (Origin.Right.IsConstant)
+                {
+                    formula += $"{Origin.Right.GetFormula(injectValue)}";
+                }
+                else
+                {
+                    var rightOperation = Origin.Right.Origin.Operation;
+                    if (rightOperation == Operations.Add ||
+                        rightOperation == Operations.Subtract)
+                        formula += $"({Origin.Right.GetFormula(injectValue)})";
+                    else
+                        formula += $"{Origin.Right.GetFormula(injectValue)}";
+                }
+
+                return formula;
+            }
+
+            if (Origin.Operation == Operations.Min ||
+                Origin.Operation == Operations.Max)
+                return $"{Origin.Operation.Description()}({Origin.Left.GetFormula(injectValue)}, {Origin.Right.GetFormula(injectValue)})";
+
+            return $"{Origin.Left.GetFormula(injectValue)} {Origin.Operation.Description()} {Origin.Right.GetFormula(injectValue)}";
+        }
+
+        public Operand AsConstant()
+        {
+            return new Operand(Name, Value);
+        }
+
         public override string ToString()
         {
             return $"[[{Id}]]";
         }
 
+        public static Operand Min(Operand left, Operand right)
+        {
+            var value = Math.Min(left.Value, right.Value);
+            var origin = new Origin(left, right, Operations.Min);
+
+            return new Operand(null, value, origin);
+        }
+
+        public static Operand Max(Operand left, Operand right)
+        {
+            var value = Math.Max(left.Value, right.Value);
+            var origin = new Origin(left, right, Operations.Max);
+
+            return new Operand(null, value, origin);
+        }
+
+        public static Operand Round(Operand operand)
+        {
+            var value = Math.Round(operand.Value);
+            var origin = new Origin(operand, new Operand(), Operations.Round);
+
+            return new Operand(null, value, origin);
+        }
+
+        public static Operand Floor(Operand operand)
+        {
+            var value = Math.Floor(operand.Value);
+            var origin = new Origin(operand, new Operand(), Operations.Floor);
+
+            return new Operand(null, value, origin);
+        }
+
+        public static Operand Ceiling(Operand operand)
+        {
+            var value = Math.Ceiling(operand.Value);
+            var origin = new Origin(operand, new Operand(), Operations.Ceiling);
+
+            return new Operand(null, value, origin);
+        }
+
         private static string GetId()
         {
             return Guid.NewGuid().ToString().ToUpperInvariant();
+        }
+
+        private static Operand Add(Operand left, Operand right)
+        {
+            var value = left.Value + right.Value;
+            var origin = new Origin(left, right, Operations.Add);
+
+            return new Operand(null, value, origin);
+        }
+
+        private static Operand Subtract(Operand left, Operand right)
+        {
+            var value = left.Value - right.Value;
+            var origin = new Origin(left, right, Operations.Subtract);
+
+            return new Operand(null, value, origin);
+        }
+
+        private static Operand Multiply(Operand left, Operand right)
+        {
+            var value = left.Value * right.Value;
+            var origin = new Origin(left, right, Operations.Multiply);
+
+            return new Operand(null, value, origin);
+        }
+
+        private static Operand Divide(Operand left, Operand right)
+        {
+            var value = left.Value / right.Value;
+            var origin = new Origin(left, right, Operations.Divide);
+
+            return new Operand(null, value, origin);
+        }
+
+        private static Operand Remainder(Operand left, Operand right)
+        {
+            var value = left.Value % right.Value;
+            var origin = new Origin(left, right, Operations.Remainder);
+
+            return new Operand(null, value, origin);
         }
 
         #endregion

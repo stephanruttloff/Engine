@@ -1,23 +1,48 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System;
 
 namespace Engine
 {
-    public struct Origin
+    internal class Origin
     {
         #region Properties
 
-        public string Algorithm { get; }
-        public ReadOnlyCollection<Operand> Operands { get; }
+        public Operand Left { get; }
+        public Operand Right { get; }
+        public Operations Operation { get; }
+
+        public bool Binary
+        {
+            get
+            {
+                switch (Operation)
+                {
+                    case Operations.Add:
+                    case Operations.Divide:
+                    case Operations.Remainder:
+                    case Operations.Subtract:
+                    case Operations.Max:
+                    case Operations.Min:
+                    case Operations.Multiply:
+                        return true;
+                    case Operations.Ceiling:
+                    case Operations.Floor:
+                    case Operations.Round:
+                        return false;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
 
         #endregion
 
         #region Constructor
 
-        public Origin(string algorithm, params Operand[] operands)
+        public Origin(Operand left, Operand right, Operations operation)
         {
-            Algorithm = algorithm;
-            Operands = operands.ToList().AsReadOnly();
+            Left = left;
+            Right = right;
+            Operation = operation;
         }
 
         #endregion
